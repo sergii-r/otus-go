@@ -8,6 +8,7 @@ import (
 )
 
 var ErrInvalidString = errors.New("invalid string")
+var ErrInvalidEscaping = errors.New("only digits or slashes can be escaped")
 
 func Unpack(str string) (string, error) {
 	var result strings.Builder
@@ -21,13 +22,22 @@ func Unpack(str string) (string, error) {
 				return "", ErrInvalidString
 			}
 
-			repeatCount, _ := strconv.Atoi(string(currentSymbol))
+			repeatCount, err := strconv.Atoi(string(currentSymbol))
+			if err != nil {
+				return "", err
+			}
+
 			result.WriteString(strings.Repeat(string(prevSymbol), repeatCount))
 			prevSymbolIsDigit = true
 			continue
 		}
 
+		if slashed && !unicode.IsDigit(currentSymbol) && currentSymbol != '\\' {
+			return "", ErrInvalidEscaping
+		}
+
 		slashed = currentSymbol == '\\' && !slashed
+
 		if slashed {
 			continue
 		}
