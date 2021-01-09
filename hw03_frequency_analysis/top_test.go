@@ -47,13 +47,23 @@ var shortText = `Тили-бом! Тили-бом!
 	Загорелся кошкин дом,
 	Идёт дым столбом!`
 
+var englishText = `Jingle bells, jingle bells
+	Jingle all the way
+	Oh, what fun it is to ride
+	In a one horse open sleigh`
+
+var germanText = `Dezemberträume
+	sind helle Sterne in der Nacht
+	Dezemberträume
+	sind aus Musik und Licht gemacht`
+
 func TestTop10(t *testing.T) {
 	t.Run("no words in empty string", func(t *testing.T) {
 		require.Len(t, Top10(""), 0)
 	})
 
 	t.Run("no words - only special symbols", func(t *testing.T) {
-		require.Len(t, Top10("!!!\"\"\",,,,...   - \t\v\r\n\f\t\v\n\f"), 0)
+		require.Len(t, Top10("!@#$%^&*()=_;:[]|{}+<>~\"\"\",,,,...   - \t\v\r\n\f\t\v\n\f"), 0)
 	})
 
 	t.Run("positive test", func(t *testing.T) {
@@ -79,5 +89,40 @@ func TestTop10(t *testing.T) {
 	t.Run("multiple word 2 forms positive test", func(t *testing.T) {
 		expected := []string{"какой-то", "какойто"}
 		require.Subset(t, expected, Top10("какой-то какойто"))
+	})
+
+	t.Run("positive test", func(t *testing.T) {
+		if taskWithAsteriskIsCompleted {
+			expected := []string{"он", "а", "и", "что", "ты", "не", "если", "то", "его", "кристофер", "робин", "в"}
+			require.Subset(t, expected, Top10(text))
+		} else {
+			expected := []string{"он", "и", "а", "что", "ты", "не", "если", "-", "то", "Кристофер"}
+			require.ElementsMatch(t, expected, Top10(text))
+		}
+	})
+
+	t.Run("short text positive test", func(t *testing.T) {
+		expected := []string{"тили-бом", "загорелся", "кошкин", "дом", "идёт", "дым", "столбом"}
+		require.Subset(t, expected, Top10(shortText))
+	})
+
+	t.Run("multiple word forms positive test", func(t *testing.T) {
+		expected := []string{"нога"}
+		require.Subset(t, expected, Top10("Нога нога нога! 'нога'"))
+	})
+
+	t.Run("multiple word 2 forms positive test", func(t *testing.T) {
+		expected := []string{"какой-то", "какойто"}
+		require.Subset(t, expected, Top10("какой-то какойто"))
+	})
+
+	t.Run("english text positive test", func(t *testing.T) {
+		expected := []string{"jingle", "bells", "is", "the", "way", "oh", "what", "fun", "it", "all"}
+		require.ElementsMatch(t, expected, Top10(englishText))
+	})
+
+	t.Run("english text positive test", func(t *testing.T) {
+		expected := []string{"dezemberträume", "sind", "helle", "sterne", "in", "der", "nacht", "aus", "musik", "und"}
+		require.ElementsMatch(t, expected, Top10(germanText))
 	})
 }

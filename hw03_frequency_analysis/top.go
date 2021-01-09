@@ -6,23 +6,20 @@ import (
 	"strings"
 )
 
+var reg = regexp.MustCompile(`[\p{L}\d]+-?[\p{L}\d]*`)
+
 func Top10(text string) []string {
-	reg := regexp.MustCompile(`[!"',. \t\v\r\n\f]+`)
-	textWords := reg.Split(text, -1)
+	textWords := reg.FindAllString(text, -1)
 
 	wordStatMap := map[string]int{}
+	wordStatSlice := make([]string, 0)
 
 	for _, word := range textWords {
-		if word == "" || word == "-" {
-			continue
+		word = strings.ToLower(word)
+		if _, ok := wordStatMap[word]; !ok {
+			wordStatSlice = append(wordStatSlice, word)
 		}
-		wordStatMap[strings.ToLower(word)]++
-	}
-
-	wordStatSlice := make([]string, 0, len(wordStatMap))
-
-	for word := range wordStatMap {
-		wordStatSlice = append(wordStatSlice, word)
+		wordStatMap[word]++
 	}
 
 	sort.Slice(wordStatSlice, func(i, j int) bool {
